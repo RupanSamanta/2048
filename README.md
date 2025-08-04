@@ -32,7 +32,7 @@ Use your **arrow keys** (Up, Down, Left, Right) or **W, A, S, D** to move the ti
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/RupanSamanta/2048.git](https://github.com/RupanSamanta/2048.git)
+    git clone https://github.com/RupanSamanta/2048.git
     ```
 
 2.  **Navigate to the project directory:**

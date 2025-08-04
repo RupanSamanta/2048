@@ -1,14 +1,19 @@
 const SIZE = 4;
 const TILE_SIZE = 91;
 const TILE_OFFSET = 10;
+const ANIMATION_DURATION = 150;
 
 let board = [];
 let score = 0;
 let bestScore = Number(localStorage.getItem("best-2048")) || 0;
+let isMoving = false; // Prevent multiple moves during animation
+let tileCounter = 0; // Unique tile IDs
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
     score = 0;
+    tileCounter = 0;
+    $('.tile').remove(); // Clear all tiles
     addRandomTile();
     addRandomTile();
     updateUI();
@@ -23,7 +28,8 @@ function addRandomTile() {
     }
     if (empty.length === 0) return;
     const [r, c] = empty[Math.floor(Math.random() * empty.length)];
-    board[r][c] = Math.random() < 0.9 ? 2 : 4;
+    const value = Math.random() < 0.9 ? 2 : 4;
+    board[r][c] = { value, id: ++tileCounter, isNew: true };
 }
 
 function getPosition(row, col) {
@@ -38,27 +44,49 @@ function updateUI() {
 
     for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-            const val = board[r][c];
-            if (!val) continue;
+            const cell = board[r][c];
+            if (!cell) continue;
 
-            const tileId = `tile-r${r}-c${c}`;
+            const tileId = `tile-${cell.id}`;
             const pos = getPosition(r, c);
             let $tile = $(`#${tileId}`);
 
             if ($tile.length === 0) {
-                $tile = $(`<div class="tile" data-tile-value="${val}" id="${tileId}">${val}</div>`);
+                // Create new tile with immediate positioning to avoid jump
+                $tile = $(`<div class="tile ${cell.isNew ? 'new-tile' : ''}" data-tile-value="${cell.value}" id="${tileId}" style="top: ${pos.y}px; left: ${pos.x}px;">${cell.value}</div>`);
                 $(".tile-layer").append($tile);
+
+                // Remove new-tile class after animation
+                if (cell.isNew) {
+                    setTimeout(() => {
+                        cell.isNew = false;
+                        $tile.removeClass('new-tile');
+                    }, 200);
+                }
             } else {
-                $tile.text(val).attr("data-tile-value", val);
+                // Update existing tile
+                $tile.text(cell.value).attr("data-tile-value", cell.value);
+                $tile.css({ top: `${pos.y}px`, left: `${pos.x}px` });
+
+                // Add merged animation if this tile was just merged
+                if (cell.merged) {
+                    $tile.addClass('merged');
+                    setTimeout(() => {
+                        cell.merged = false;
+                        $tile.removeClass('merged');
+                    }, 200);
+                }
             }
 
-            $tile.css({ top: `${pos.y}px`, left: `${pos.x}px` });
             existingTiles.add(tileId);
         }
     }
 
+    // Remove tiles that no longer exist
     $(".tile").each(function () {
-        if (!existingTiles.has(this.id)) $(this).remove();
+        if (!existingTiles.has(this.id)) {
+            $(this).remove();
+        }
     });
 
     $("#score").text(score);
@@ -66,77 +94,220 @@ function updateUI() {
 }
 
 function moveLeft() {
+    if (isMoving) return;
+
     let changed = false;
+    const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+
     for (let r = 0; r < SIZE; r++) {
-        let row = board[r].filter(x => x);
-        for (let i = 0; i < row.length - 1; i++) {
-            if (row[i] === row[i + 1]) {
-                row[i] *= 2;
-                score += row[i];
-                row[i + 1] = 0;
-                i++;
+        const row = board[r].filter(cell => cell && cell.value > 0);
+        let pos = 0;
+
+        for (let i = 0; i < row.length; i++) {
+            if (i < row.length - 1 && row[i].value === row[i + 1].value) {
+                // Merge tiles
+                const mergedValue = row[i].value * 2;
+                newBoard[r][pos] = {
+                    value: mergedValue,
+                    id: row[i].id,
+                    merged: true
+                };
+                score += mergedValue;
+                i++; // Skip the next tile as it's been merged
                 changed = true;
+            } else {
+                // Move tile
+                newBoard[r][pos] = { ...row[i] };
+                if (pos !== findOriginalPosition(row[i].id, board)[1]) {
+                    changed = true;
+                }
+            }
+            pos++;
+        }
+    }
+
+    if (changed) {
+        board = newBoard;
+        afterMove();
+    }
+}
+
+function findOriginalPosition(id, originalBoard) {
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+            if (originalBoard[r][c] && originalBoard[r][c].id === id) {
+                return [r, c];
             }
         }
-        row = row.filter(x => x);
-        while (row.length < SIZE) row.push(0);
-        if (!arraysEqual(row, board[r])) changed = true;
-        board[r] = row;
     }
-    if (changed) afterMove();
+    return [-1, -1];
 }
 
 function moveRight() {
-    reverseRows();
-    moveLeft();
-    reverseRows();
-    updateUI();
+    if (isMoving) return;
+
+    let changed = false;
+    const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+
+    for (let r = 0; r < SIZE; r++) {
+        const row = board[r].filter(cell => cell && cell.value > 0);
+        let pos = SIZE - 1;
+
+        for (let i = row.length - 1; i >= 0; i--) {
+            if (i > 0 && row[i].value === row[i - 1].value) {
+                // Merge tiles
+                const mergedValue = row[i].value * 2;
+                newBoard[r][pos] = {
+                    value: mergedValue,
+                    id: row[i].id,
+                    merged: true
+                };
+                score += mergedValue;
+                i--; // Skip the next tile as it's been merged
+                changed = true;
+            } else {
+                // Move tile
+                newBoard[r][pos] = { ...row[i] };
+                if (pos !== findOriginalPosition(row[i].id, board)[1]) {
+                    changed = true;
+                }
+            }
+            pos--;
+        }
+    }
+
+    if (changed) {
+        board = newBoard;
+        afterMove();
+    }
 }
 
 function moveUp() {
-    transpose();
-    moveLeft();
-    transpose();
-    updateUI();
+    if (isMoving) return;
+
+    let changed = false;
+    const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+
+    for (let c = 0; c < SIZE; c++) {
+        const column = [];
+        for (let r = 0; r < SIZE; r++) {
+            if (board[r][c] && board[r][c].value > 0) {
+                column.push(board[r][c]);
+            }
+        }
+
+        let pos = 0;
+        for (let i = 0; i < column.length; i++) {
+            if (i < column.length - 1 && column[i].value === column[i + 1].value) {
+                // Merge tiles
+                const mergedValue = column[i].value * 2;
+                newBoard[pos][c] = {
+                    value: mergedValue,
+                    id: column[i].id,
+                    merged: true
+                };
+                score += mergedValue;
+                i++; // Skip the next tile as it's been merged
+                changed = true;
+            } else {
+                // Move tile
+                newBoard[pos][c] = { ...column[i] };
+                if (pos !== findOriginalPosition(column[i].id, board)[0]) {
+                    changed = true;
+                }
+            }
+            pos++;
+        }
+    }
+
+    if (changed) {
+        board = newBoard;
+        afterMove();
+    }
 }
 
 function moveDown() {
-    transpose();
-    moveRight();
-    transpose();
-    updateUI();
+    if (isMoving) return;
+
+    let changed = false;
+    const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
+
+    for (let c = 0; c < SIZE; c++) {
+        const column = [];
+        for (let r = 0; r < SIZE; r++) {
+            if (board[r][c] && board[r][c].value > 0) {
+                column.push(board[r][c]);
+            }
+        }
+
+        let pos = SIZE - 1;
+        for (let i = column.length - 1; i >= 0; i--) {
+            if (i > 0 && column[i].value === column[i - 1].value) {
+                // Merge tiles
+                const mergedValue = column[i].value * 2;
+                newBoard[pos][c] = {
+                    value: mergedValue,
+                    id: column[i].id,
+                    merged: true
+                };
+                score += mergedValue;
+                i--; // Skip the next tile as it's been merged
+                changed = true;
+            } else {
+                // Move tile
+                newBoard[pos][c] = { ...column[i] };
+                if (pos !== findOriginalPosition(column[i].id, board)[0]) {
+                    changed = true;
+                }
+            }
+            pos--;
+        }
+    }
+
+    if (changed) {
+        board = newBoard;
+        afterMove();
+    }
 }
 
 function afterMove() {
-    addRandomTile();
+    isMoving = true;
     updateUI();
-    if (score > bestScore) {
-        bestScore = score;
-        localStorage.setItem("best-2048", bestScore);
-    }
-    if (checkGameOver()) {
-        setTimeout(() => alert("Game Over!"), 100);
-    }
-}
 
-function transpose() {
-    board = board[0].map((_, c) => board.map(row => row[c]));
-}
+    // Add new tile quickly after move starts, not after animation completes
+    setTimeout(() => {
+        addRandomTile();
+        updateUI();
+    }, 50); // Much shorter delay - new tile appears while other tiles are still moving
 
-function reverseRows() {
-    board = board.map(row => [...row].reverse());
-}
+    setTimeout(() => {
+        if (score > bestScore) {
+            bestScore = score;
+            localStorage.setItem("best-2048", bestScore);
+        }
 
-function arraysEqual(a, b) {
-    return a.length === b.length && a.every((v, i) => v === b[i]);
+        if (checkGameOver()) {
+            setTimeout(() => alert("Game Over!"), 100);
+        }
+
+        isMoving = false;
+    }, ANIMATION_DURATION);
 }
 
 function checkGameOver() {
+    // Check for empty cells
     for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-            if (board[r][c] === 0) return false;
-            if (c < SIZE - 1 && board[r][c] === board[r][c + 1]) return false;
-            if (r < SIZE - 1 && board[r][c] === board[r + 1][c]) return false;
+            if (!board[r][c]) return false;
+        }
+    }
+
+    // Check for possible merges
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+            const current = board[r][c].value;
+            if (c < SIZE - 1 && board[r][c + 1] && current === board[r][c + 1].value) return false;
+            if (r < SIZE - 1 && board[r + 1][c] && current === board[r + 1][c].value) return false;
         }
     }
     return true;
@@ -146,11 +317,25 @@ $(document).ready(function () {
     $('#new-game').on('click', initGame);
 
     $(document).on('keydown', function (e) {
+        if (isMoving) return; // Prevent moves during animation
+
         switch (e.key) {
-            case "ArrowLeft": moveLeft(); break;
-            case "ArrowRight": moveRight(); break;
-            case "ArrowUp": moveUp(); break;
-            case "ArrowDown": moveDown(); break;
+            case "ArrowLeft":
+                e.preventDefault();
+                moveLeft();
+                break;
+            case "ArrowRight":
+                e.preventDefault();
+                moveRight();
+                break;
+            case "ArrowUp":
+                e.preventDefault();
+                moveUp();
+                break;
+            case "ArrowDown":
+                e.preventDefault();
+                moveDown();
+                break;
         }
     });
 
