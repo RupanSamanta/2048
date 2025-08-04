@@ -1,0 +1,5 @@
+# Ignore all SCSS files
+**/*.scss
+
+# Ignore CSS source maps
+**/*.css.map

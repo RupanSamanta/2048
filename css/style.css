@@ -1,0 +1,154 @@
+@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap");
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: "League Spartan", sans-serif;
+}
+
+.game-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 530px;
+  background-color: #d9d9d9;
+  border-radius: 15px;
+  padding: 13px;
+}
+.game-body .game-header {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  place-items: center;
+  gap: 10px;
+  margin: 5px auto 13px auto;
+}
+.game-body .game-header > div {
+  width: 175px;
+  height: 50px;
+  background-color: #ad9d8e;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #EEE4DA;
+  font-weight: 600;
+  font-size: 20px;
+}
+.game-body .game-header div.title {
+  font-size: 60px;
+  font-weight: 800;
+  color: #8e8073;
+  background-color: transparent;
+  padding-top: 10px;
+}
+.game-body .game-header div#new-game {
+  background-color: #8e8073;
+  color: #EEE4DA;
+  cursor: pointer;
+}
+.game-body .game-header div.score-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+.game-body .game-grid {
+  width: 374px;
+  height: 374px;
+  background-color: #ad9d8e;
+  border-radius: 15px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+  position: relative;
+}
+.game-body .game-grid .grid-items {
+  width: 81px;
+  height: 81px;
+  border-radius: inherit;
+  background-color: rgba(238, 228, 218, 0.4);
+}
+.game-body .game-grid .tile-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+.game-body .game-grid .tile-layer .tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 81px;
+  height: 81px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #f9f6f2;
+  border-radius: 15px;
+  box-shadow: 0 1px 5px -5px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+}
+.game-body .game-grid .tile-layer [data-tile-value="2"] {
+  background-color: #eee4da;
+  color: #776e65;
+}
+.game-body .game-grid .tile-layer [data-tile-value="4"] {
+  background-color: #ede0c8;
+  color: #776e65;
+}
+.game-body .game-grid .tile-layer [data-tile-value="8"] {
+  background-color: #f2b179;
+  color: #f9f6f2;
+}
+.game-body .game-grid .tile-layer [data-tile-value="16"] {
+  background-color: #f59563;
+}
+.game-body .game-grid .tile-layer [data-tile-value="32"] {
+  background-color: #f67c5f;
+}
+.game-body .game-grid .tile-layer [data-tile-value="64"] {
+  background-color: #f65e3b;
+}
+.game-body .game-grid .tile-layer [data-tile-value="128"] {
+  background-color: #edcf72;
+}
+.game-body .game-grid .tile-layer [data-tile-value="256"] {
+  background-color: #edcc61;
+}
+.game-body .game-grid .tile-layer [data-tile-value="512"] {
+  background-color: #edc850;
+}
+.game-body .game-grid .tile-layer [data-tile-value="1024"] {
+  background-color: #edc53f;
+}
+.game-body .game-grid .tile-layer [data-tile-value="2048"] {
+  background-color: #edc22e;
+}
+.game-body .game-grid .tile-layer [data-tile-value="4096"] {
+  background-color: #3c3a32;
+}
+.game-body .game-grid .tile-layer [data-tile-value="8192"] {
+  background-color: #1a1a1a;
+}
+
+@keyframes tile-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}/*# sourceMappingURL=style.css.map */
