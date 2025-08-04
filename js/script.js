@@ -283,6 +283,7 @@ function afterMove() {
     setTimeout(() => {
         if (score > bestScore) {
             bestScore = score;
+            $("#best-score").text(score)
             localStorage.setItem("best-2048", bestScore);
         }
 

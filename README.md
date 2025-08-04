@@ -26,7 +26,7 @@ Use your **arrow keys** (Up, Down, Left, Right) or **W, A, S, D** to move the ti
 
 ### Live Demo
 
-➡️ [**Play 2048 Now!**](link_to_your_live_demo)
+➡️ [**Play 2048 Now!**](https://rupansamanta.github.io/2048/)
 
 ### Installation & Setup (for Developers)
 
