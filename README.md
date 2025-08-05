@@ -1,4 +1,4 @@
-### 2048 Game
+# 2048 Game
 
 A classic and addictive puzzle game where you combine tiles to reach the **2048** tile.
 
