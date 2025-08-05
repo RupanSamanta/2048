@@ -1,10 +1,10 @@
-### 2048 Game
+# 2048 Game
 
 A classic and addictive puzzle game where you combine tiles to reach the **2048** tile.
 
 ---
 
-### Introduction
+## Introduction
 
 This is a browser-based implementation of the popular 2048 game, originally created by Gabriele Cirulli. The game's objective is to combine numbered tiles on a 4x4 grid to create a tile with the number 2048.
 
@@ -30,17 +30,19 @@ Use your **arrow keys** (Up, Down, Left, Right) or **W, A, S, D** to move the ti
 
 ### Installation & Setup (for Developers)
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
+
     ```bash
     git clone https://github.com/RupanSamanta/2048.git
     ```
 
-2.  **Navigate to the project directory:**
+2. **Navigate to the project directory:**
+
     ```bash
     cd 2048
     ```
 
-3.  **Open `index.html` in your web browser.**
+3. **Open `index.html` in your web browser.**
 
 ### Technologies Used
 
@@ -52,11 +54,11 @@ Use your **arrow keys** (Up, Down, Left, Right) or **W, A, S, D** to move the ti
 
 Contributions are welcome! Feel free to open an issue or submit a pull request.
 
-1.  Fork the repository.
-2.  Create a new branch: `git checkout -b feature/your-feature-name`
-3.  Make your changes and commit them: `git commit -m 'feat: add a new feature'`
-4.  Push to the branch: `git push origin feature/your-feature-name`
-5.  Open a Pull Request.
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Make your changes and commit them: `git commit -m 'feat: add a new feature'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a Pull Request.
 
 ### Inspiration & Credits
 
