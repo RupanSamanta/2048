@@ -5,7 +5,7 @@ const ANIMATION_DURATION = 150;
 
 let board = [];
 let score = 0;
-let bestScore = Number(localStorage.getItem("best-2048")) || 0;
+let bestScore = Number(localStorage.getItem("best-score")) || 0;
 let isMoving = false; // Prevent multiple moves during animation
 let tileCounter = 0; // Unique tile IDs
 
@@ -90,7 +90,9 @@ function updateUI() {
     });
 
     $("#score").text(score);
+    bestScore = Math.max(bestScore, score);
     $("#best-score").text(bestScore);
+    localStorage.setItem("best-score", bestScore);
 }
 
 function moveLeft() {
@@ -283,8 +285,7 @@ function afterMove() {
     setTimeout(() => {
         if (score > bestScore) {
             bestScore = score;
-            $("#best-score").text(score)
-            localStorage.setItem("best-2048", bestScore);
+            localStorage.setItem("best-score", bestScore);
         }
 
         if (checkGameOver()) {
@@ -322,18 +323,22 @@ $(document).ready(function () {
 
         switch (e.key) {
             case "ArrowLeft":
+            case "a":
                 e.preventDefault();
                 moveLeft();
                 break;
             case "ArrowRight":
+            case "d":
                 e.preventDefault();
                 moveRight();
                 break;
             case "ArrowUp":
+            case "w":
                 e.preventDefault();
                 moveUp();
                 break;
             case "ArrowDown":
+            case "s":
                 e.preventDefault();
                 moveDown();
                 break;
