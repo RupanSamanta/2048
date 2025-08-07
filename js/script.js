@@ -8,6 +8,8 @@ let score = 0;
 let bestScore = Number(localStorage.getItem("best-score")) || 0;
 let isMoving = false; // Prevent multiple moves during animation
 let tileCounter = 0; // Unique tile IDs
+let initialX = null;
+let initialY = null; // initial position of screen touch
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
@@ -315,6 +317,37 @@ function checkGameOver() {
     return true;
 }
 
+function startTouch(e) {
+   initialX = e.touches[0].clientX;
+   initialY = e.touches[0].clientY;
+}
+
+function moveTouch(e) {
+   if (initialX === null || initialY === null) {
+      return;
+   }
+   let currentX = e.touches[0].clientX;
+   let currentY = e.touches[0].clientY;
+   
+   let diffX = initialX - currentX;
+   let diffY = initialY - currentY;
+   
+   if (Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+         moveLeft();
+      } else {
+         moveRight();
+      }
+   } else {
+      if (diffY > 0) {
+         moveUp();
+      } else {
+         moveDown();
+      }
+   }
+   initialX = initialY = null;
+}
+
 $(document).ready(function () {
     $('#new-game').on('click', initGame);
 
@@ -344,6 +377,10 @@ $(document).ready(function () {
                 break;
         }
     });
+    
+    $('.game-grid')
+    .on('touchstart', startTouch)
+    .on('touchmove', moveTouch);
 
     initGame();
 });
