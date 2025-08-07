@@ -5,7 +5,10 @@
   margin: 0;
   font-family: "League Spartan", sans-serif;
 }
-
+html, body {
+   overscroll-behavior: none;
+   overscroll-behavior-y: none;
+}
 .game-body {
   position: absolute;
   top: 50%;
