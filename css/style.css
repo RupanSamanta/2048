@@ -168,4 +168,24 @@ html, body {
   100% {
     transform: scale(1);
   }
-}/*# sourceMappingURL=style.css.map */
+}
+
+@media (max-width: 480px) {
+   .game-body {
+      transform: translate(-50%, -50%) scale(0.9);
+      background-color: transparent;
+   }
+   .game-body .game-header div.title {
+      background-color: #ad9d8e;
+      color: #EEE4DA;
+      font-size: 40px;
+   }
+}
+
+@media (max-width: 360px) {
+   .game-body {
+      transform: translate(-50%, -50%) scale(0.85);
+   }
+}
+
+/*# sourceMappingURL=style.css.map */
