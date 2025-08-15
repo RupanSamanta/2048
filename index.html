@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>2048</title>
     <meta property="og:title" content="2048">
     <meta property="og:description" content="Play the classic 2048 puzzle game online. Combine tiles and reach 2048!">
@@ -49,6 +49,16 @@
             <div class="grid-items"></div>
             <div class="tile-layer"></div>
         </div>
+        <dialog id="dialog-box">
+           
+              <div class="message">
+                 <h3 class="message-heading">New Game</h3>             
+                 <p class="message-text">Are you sure you want to start a new game?</p>
+              </div>
+              <button id="new-game" value="new-game">Start New Game</button>
+              <button id="cancel" value="cancel">Cancel</button>
+
+       </dialog>
     </div>
     
 <script src="js/jquery-3.7.1.min.js"></script>
