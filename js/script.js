@@ -1,7 +1,7 @@
 const SIZE = 4;
 const TILE_SIZE = 91;
 const TILE_OFFSET = 10;
-const ANIMATION_DURATION = 150;
+const ANIMATION_DURATION = 120;
 
 let board = [];
 let score = 0;
@@ -9,7 +9,7 @@ let bestScore = Number(localStorage.getItem("best-score")) || 0;
 let isMoving = false; // Prevent multiple moves during animation
 let tileCounter = 0; // Unique tile IDs
 let initialX = null;
-let initialY = null; // initial position of screen touch
+let initialY = null;
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
@@ -349,8 +349,6 @@ function moveTouch(e) {
 }
 
 $(document).ready(function () {
-    $('#new-game').on('click', initGame);
-
     $(document).on('keydown', function (e) {
         if (isMoving) return; // Prevent moves during animation
 
@@ -381,6 +379,21 @@ $(document).ready(function () {
     $('.game-grid')
     .on('touchstart', startTouch)
     .on('touchmove', moveTouch);
-
+    
+    $('#new-game').click(()=> {
+       $('#dialog-box')[0].showModal();
+    });
+    
+    $('#dialog-box button').click(function(e) {
+       e.preventDefault();
+       $('#dialog-box').addClass('closing');
+       setTimeout(()=> {
+          $('#dialog-box').removeClass('closing')
+          $('#dialog-box')[0].close();
+          if (this.value == 'new-game')
+             initGame();
+       }, 250);
+    });
+    
     initGame();
 });
