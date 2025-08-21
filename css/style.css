@@ -21,7 +21,7 @@
   border: none;
   font-family: "League Spartan", sans-serif;
 }
-button * {
+button {
    cursor: pointer;
 }
 html, body {
