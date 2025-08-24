@@ -11,6 +11,7 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/RupanSamanta/2048/refs/heads/main/images/2048_logo.png">
     <link rel="icon" href="images/2048_logo.png" type="image/png">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://kit.fontawesome.com/82872eeccd.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="game-body">
@@ -48,6 +49,16 @@
             <div class="grid-items"></div>
             <div class="grid-items"></div>
             <div class="tile-layer"></div>
+        </div>
+        <div class="game-buttons">
+           <button id="undo-button">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span id="undo-turns">2</span>
+           </button>
+           <button id="swap-tiles-buttons">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span id="swap-tiles-turns">2</span>
+           </button>
         </div>
         <dialog id="dialog-box">
            

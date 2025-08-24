@@ -25,7 +25,8 @@ function addRandomTile() {
     const empty = [];
     for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-            if (board[r][c] === 0) empty.push([r, c]);
+            if (board[r][c] === 0) 
+              empty.push([r, c]);
         }
     }
     if (empty.length === 0) return;
