@@ -290,6 +290,7 @@ function afterMove() {
     updateUI();
     // Add new tile quickly after move starts, not after animation completes
     $('#undo-button').prop('disabled', !Boolean(canUndo));
+    movesCount++;
     //$('#undo-turns').text(canUndo);
     setTimeout(() => {
         addRandomTile();
@@ -379,10 +380,10 @@ function undoMove() {
   board = previousState.board;
   score = previousState.score;
   tileCounter = previousState.tileCounter;
-    
+  movesCount--;
   canUndo--;
   updateUI();
-  $('#undo-button').prop('disabled', !Boolean(canUndo));
+  $('#undo-button').prop('disabled', !canUndo || !movesCount);
   $('#undo-turns').text(canUndo);
 }
 
