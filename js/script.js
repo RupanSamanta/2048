@@ -5,17 +5,23 @@ const ANIMATION_DURATION = 120;
 
 let board = [];
 let score = 0;
+let movesCount = 0;
 let bestScore = Number(localStorage.getItem("best-score")) || 0;
 let isMoving = false; // Prevent multiple moves during animation
 let tileCounter = 0; // Unique tile IDs
 let initialX = null;
 let initialY = null;
+let previousState = null; 
+let canUndo = 5;
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
     score = 0;
     tileCounter = 0;
+    canUndo = 5;
     $('.tile').remove(); // Clear all tiles
+    $('#undo-button').prop('disabled', true);
+    $('#undo-turns').text(canUndo);
     addRandomTile();
     addRandomTile();
     updateUI();
@@ -100,6 +106,7 @@ function updateUI() {
 
 function moveLeft() {
     if (isMoving) return;
+    saveGameState(); // Save current state before moving
 
     let changed = false;
     const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
@@ -151,6 +158,7 @@ function findOriginalPosition(id, originalBoard) {
 function moveRight() {
     if (isMoving) return;
 
+    saveGameState();
     let changed = false;
     const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
 
@@ -190,6 +198,7 @@ function moveRight() {
 function moveUp() {
     if (isMoving) return;
 
+    saveGameState();
     let changed = false;
     const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
 
@@ -234,6 +243,7 @@ function moveUp() {
 function moveDown() {
     if (isMoving) return;
 
+    saveGameState();
     let changed = false;
     const newBoard = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
 
@@ -278,8 +288,9 @@ function moveDown() {
 function afterMove() {
     isMoving = true;
     updateUI();
-
     // Add new tile quickly after move starts, not after animation completes
+    $('#undo-button').prop('disabled', !Boolean(canUndo));
+    //$('#undo-turns').text(canUndo);
     setTimeout(() => {
         addRandomTile();
         updateUI();
@@ -292,7 +303,11 @@ function afterMove() {
         }
 
         if (checkGameOver()) {
-            setTimeout(() => alert("Game Over!"), 100);
+          showDialogBox({
+            heading: 'Game Over',
+            message: 'Do you want to restart the game?',
+            button: "Restart Game"
+          });
         }
 
         isMoving = false;
@@ -349,6 +364,39 @@ function moveTouch(e) {
    initialX = initialY = null;
 }
 
+function saveGameState() {
+  previousState = {
+    board: JSON.parse(JSON.stringify(board)),
+    score: score,
+    tileCounter: tileCounter
+  };
+}
+
+function undoMove() {
+  if (!canUndo || !previousState || isMoving)
+    return;
+
+  board = previousState.board;
+  score = previousState.score;
+  tileCounter = previousState.tileCounter;
+    
+  canUndo--;
+  updateUI();
+  $('#undo-button').prop('disabled', !Boolean(canUndo));
+  $('#undo-turns').text(canUndo);
+}
+
+function showDialogBox(mesg) {
+  const box = $('#dialog-box .message').eq(0);
+  box.children('.message-heading').eq(0)
+  .text(mesg.heading);
+  box.children('.message-text').eq(0)
+  .text(mesg.message);
+  $('#dialog-box button').eq(0)
+  .text(mesg.button);
+  $('#dialog-box')[0].showModal();
+}
+
 $(document).ready(function () {
     $(document).on('keydown', function (e) {
         if (isMoving) return; // Prevent moves during animation
@@ -382,7 +430,11 @@ $(document).ready(function () {
     .on('touchmove', moveTouch);
     
     $('#new-game').click(()=> {
-       $('#dialog-box')[0].showModal();
+      showDialogBox({
+        heading: 'New Game',
+        message: 'Do you want to start a new game?',
+        button: "Start New Game"
+      });
     });
     
     $('#dialog-box button').click(function(e) {
@@ -395,6 +447,8 @@ $(document).ready(function () {
              initGame();
        }, 250);
     });
+    
+    $('#undo-button').click(undoMove);
     
     initGame();
 });
