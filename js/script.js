@@ -387,6 +387,59 @@ function undoMove() {
   $('#undo-turns').text(canUndo);
 }
 
+let selectedTile = null;
+
+function swapTiles(tile1, tile2) {
+    if (isMoving) return;
+    
+    // Find positions of both tiles
+    let pos1 = null, pos2 = null;
+    for (let r = 0; r < SIZE; r++) {
+        for (let c = 0; c < SIZE; c++) {
+            if (board[r][c] && board[r][c].id === parseInt(tile1.id.split('-')[1])) {
+                pos1 = [r, c];
+            }
+            if (board[r][c] && board[r][c].id === parseInt(tile2.id.split('-')[1])) {
+                pos2 = [r, c];
+            }
+        }
+    }
+
+    if (!pos1 || !pos2) return;
+
+    // Swap the tiles in the board array
+    const temp = board[pos1[0]][pos1[1]];
+    board[pos1[0]][pos1[1]] = board[pos2[0]][pos2[1]];
+    board[pos2[0]][pos2[1]] = temp;
+
+    updateUI();
+}
+
+let swapMode = false;
+
+$('#swap-tiles-button').click(function() {
+    swapMode = true;
+    $(this).addClass('active');
+});
+
+$('.tile-layer').on('click', '.tile', function() {
+    if (!swapMode) return;
+
+    if (selectedTile === null) {
+        selectedTile = this;
+        $(this).addClass('selected');
+    } else {
+        if (this !== selectedTile) {
+            swapTiles(selectedTile, this);
+        }
+        $(selectedTile).removeClass('selected');
+        selectedTile = null;
+        swapMode = false;
+        $('#swap-tiles-button').removeClass('active');
+    }
+});
+
+
 function showDialogBox(mesg) {
   const box = $('#dialog-box .message').eq(0);
   box.children('.message-heading').eq(0)
