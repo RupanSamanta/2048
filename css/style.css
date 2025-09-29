@@ -12,6 +12,7 @@
   --bodyWidth: 400px;
   --bodyHeight: 530px;
   --fontSize: 20px;
+  --tile-brightness: 1;
 }
 
 * {
@@ -142,19 +143,20 @@ body {
   color: #f9f6f2;
   border-radius: calc(var(--borderRadius) - 3px);
   box-shadow: 0 2px 5px -2px rgba(0, 0, 0, 0.7);
+  filter: brightness(var(--tile-brightness, 1));
   transition: all 0.2s ease-in-out;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
 }
 .game-body .game-grid .tile-layer .tile:hover {
   filter: brightness(1);
-  transform: scale(1.1);
   cursor: pointer;
+  transform: scale(1.15);
 }
 
 .game-body .game-grid .tile-layer .tile.selected {
   filter: brightness(1.1);
-  border: 3px solid #484440;
+  transform: scale(1.15);
 }
 
 .game-body .game-grid .tile-layer .tile.new-tile {

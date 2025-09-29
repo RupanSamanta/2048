@@ -13,21 +13,23 @@ let tileCounter = 0; // Unique tile IDs
 let initialX = null;
 let initialY = null;
 
-let previousState = null; 
-let canUndo = 5;
+let previousState = null;
+let undoCount = 5;
 
 let selectedTile = null;
 let swapMode = false;
+let swapCount = 5;
 
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
     score = 0;
     tileCounter = 0;
-    canUndo = 5;
+    undoCount = 5;
     $('.tile').remove(); // Clear all tiles
     $('#undo-button').prop('disabled', true);
-    $('#undo-turns').text(canUndo);
+    $('#undo-turns').text(undoCount);
+    $('#swap-tiles-turns').text(swapCount);
     addRandomTile();
     addRandomTile();
     updateUI();
@@ -37,8 +39,8 @@ function addRandomTile() {
     const empty = [];
     for (let r = 0; r < SIZE; r++) {
         for (let c = 0; c < SIZE; c++) {
-            if (board[r][c] === 0) 
-              empty.push([r, c]);
+            if (board[r][c] === 0)
+                empty.push([r, c]);
         }
     }
     if (empty.length === 0) return;
@@ -296,9 +298,9 @@ function afterMove() {
     isMoving = true;
     updateUI();
     // Add new tile quickly after move starts, not after animation completes
-    $('#undo-button').prop('disabled', canUndo <= 0 ? true : false);
+    $('#undo-button').prop('disabled', undoCount <= 0 ? true : false);
     movesCount++;
-    //$('#undo-turns').text(canUndo);
+    //$('#undo-turns').text(undoCount);
     setTimeout(() => {
         addRandomTile();
         updateUI();
@@ -311,11 +313,11 @@ function afterMove() {
         }
 
         if (checkGameOver()) {
-          showDialogBox({
-            heading: 'Game Over',
-            message: 'Do you want to restart the game?',
-            button: "Restart Game"
-          });
+            showDialogBox({
+                heading: 'Game Over',
+                message: 'Do you want to restart the game?',
+                button: "Restart Game"
+            });
         }
 
         isMoving = false;
@@ -342,61 +344,61 @@ function checkGameOver() {
 }
 
 function startTouch(e) {
-   initialX = e.touches[0].clientX;
-   initialY = e.touches[0].clientY;
+    initialX = e.touches[0].clientX;
+    initialY = e.touches[0].clientY;
 }
 
 function moveTouch(e) {
-   if (initialX === null || initialY === null) {
-      return;
-   }
-   let currentX = e.touches[0].clientX;
-   let currentY = e.touches[0].clientY;
-   
-   let diffX = initialX - currentX;
-   let diffY = initialY - currentY;
-   
-   if (Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 0) {
-         moveLeft();
-      } else {
-         moveRight();
-      }
-   } else {
-      if (diffY > 0) {
-         moveUp();
-      } else {
-         moveDown();
-      }
-   }
-   initialX = initialY = null;
+    if (initialX === null || initialY === null) {
+        return;
+    }
+    let currentX = e.touches[0].clientX;
+    let currentY = e.touches[0].clientY;
+
+    let diffX = initialX - currentX;
+    let diffY = initialY - currentY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) {
+            moveLeft();
+        } else {
+            moveRight();
+        }
+    } else {
+        if (diffY > 0) {
+            moveUp();
+        } else {
+            moveDown();
+        }
+    }
+    initialX = initialY = null;
 }
 
 function saveGameState() {
-  previousState = {
-    board: JSON.parse(JSON.stringify(board)),
-    score: score,
-    tileCounter: tileCounter
-  };
+    previousState = {
+        board: JSON.parse(JSON.stringify(board)),
+        score: score,
+        tileCounter: tileCounter
+    };
 }
 
 function undoMove() {
-  if (!canUndo || !previousState || isMoving)
-    return;
+    if (!undoCount || !previousState || isMoving)
+        return;
 
-  board = previousState.board;
-  score = previousState.score;
-  tileCounter = previousState.tileCounter;
-  movesCount--;
-  canUndo--;
-  updateUI();
-  $('#undo-button').prop('disabled', true);
-  $('#undo-turns').text(canUndo);
+    board = previousState.board;
+    score = previousState.score;
+    tileCounter = previousState.tileCounter;
+    movesCount--;
+    undoCount--;
+    updateUI();
+    $('#undo-button').prop('disabled', true);
+    $('#undo-turns').text(undoCount);
 }
 
 function swapTiles(tile1, tile2) {
     if (isMoving) return;
-    
+
     // Find positions of both tiles
     let pos1 = null, pos2 = null;
     for (let r = 0; r < SIZE; r++) {
@@ -420,10 +422,12 @@ function swapTiles(tile1, tile2) {
     updateUI();
 }
 
-$('#swap-tiles-button').click(function() {
+$('#swap-tiles-button').click(function () {
     swapMode = true;
+    isMoving = true; // Prevent moves during swap mode
     $('.tile').css('pointer-events', 'auto');
     $(this).prop('disabled', true);
+    document.documentElement.style.setProperty('--tile-brightness', '0.9');
 });
 
 function tileClickHandler(e) {
@@ -434,26 +438,30 @@ function tileClickHandler(e) {
         $(e.currentTarget).addClass('selected');
     } else {
         if (e.currentTarget !== selectedTile) {
+            isMoving = false;
             swapTiles(selectedTile, e.currentTarget);
+            swapCount--;
+            $('#swap-tiles-turns').text(swapCount);
         }
         $(selectedTile).removeClass('selected');
         selectedTile = null;
         swapMode = false;
-    $('.tile').css('pointer-events', 'none');
-        $('#swap-tiles-button').prop('disabled', false);
+        $('.tile').css('pointer-events', 'none');
+        $('#swap-tiles-button').prop('disabled', swapCount <= 0);
+        document.documentElement.style.setProperty('--tile-brightness', '1');
     }
 };
 
 
 function showDialogBox(mesg) {
-  const box = $('#dialog-box .message').eq(0);
-  box.children('.message-heading').eq(0)
-  .text(mesg.heading);
-  box.children('.message-text').eq(0)
-  .text(mesg.message);
-  $('#dialog-box button').eq(0)
-  .text(mesg.button);
-  $('#dialog-box')[0].showModal();
+    const box = $('#dialog-box .message').eq(0);
+    box.children('.message-heading').eq(0)
+        .text(mesg.heading);
+    box.children('.message-text').eq(0)
+        .text(mesg.message);
+    $('#dialog-box button').eq(0)
+        .text(mesg.button);
+    $('#dialog-box')[0].showModal();
 }
 
 $(document).ready(function () {
@@ -483,31 +491,31 @@ $(document).ready(function () {
                 break;
         }
     });
-    
+
     $('.game-grid')
-    .on('touchstart', startTouch)
-    .on('touchmove', moveTouch);
-    
-    $('#new-game').click(()=> {
-      showDialogBox({
-        heading: 'New Game',
-        message: 'Do you want to start a new game?',
-        button: "Start New Game"
-      });
+        .on('touchstart', startTouch)
+        .on('touchmove', moveTouch);
+
+    $('#new-game').click(() => {
+        showDialogBox({
+            heading: 'New Game',
+            message: 'Do you want to start a new game?',
+            button: "Start New Game"
+        });
     });
-    
-    $('#dialog-box button').click(function(e) {
-       e.preventDefault();
-       $('#dialog-box').addClass('closing');
-       setTimeout(()=> {
-          $('#dialog-box').removeClass('closing')
-          $('#dialog-box')[0].close();
-          if (this.value == 'new-game')
-             initGame();
-       }, 250);
+
+    $('#dialog-box button').click(function (e) {
+        e.preventDefault();
+        $('#dialog-box').addClass('closing');
+        setTimeout(() => {
+            $('#dialog-box').removeClass('closing')
+            $('#dialog-box')[0].close();
+            if (this.value == 'new-game')
+                initGame();
+        }, 250);
     });
-    
+
     $('#undo-button').click(undoMove);
-    
+
     initGame();
 });
