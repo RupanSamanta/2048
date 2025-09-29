@@ -20,6 +20,7 @@
   margin: 0;
   outline: none;
   border: none;
+  user-select: none;
   font-family: "League Spartan", sans-serif;
 }
 
@@ -125,7 +126,7 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 999;
 }
 
 .game-body .game-grid .tile-layer .tile {
@@ -144,6 +145,16 @@ body {
   transition: all 0.2s ease-in-out;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
+}
+.game-body .game-grid .tile-layer .tile:hover {
+  filter: brightness(1);
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.game-body .game-grid .tile-layer .tile.selected {
+  filter: brightness(1.1);
+  border: 3px solid #484440;
 }
 
 .game-body .game-grid .tile-layer .tile.new-tile {

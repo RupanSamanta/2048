@@ -9,10 +9,16 @@ let movesCount = 0;
 let bestScore = Number(localStorage.getItem("best-score")) || 0;
 let isMoving = false; // Prevent multiple moves during animation
 let tileCounter = 0; // Unique tile IDs
+
 let initialX = null;
 let initialY = null;
+
 let previousState = null; 
 let canUndo = 5;
+
+let selectedTile = null;
+let swapMode = false;
+
 
 function initGame() {
     board = Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
@@ -62,7 +68,8 @@ function updateUI() {
 
             if ($tile.length === 0) {
                 // Create new tile with immediate positioning to avoid jump
-                $tile = $(`<div class="tile ${cell.isNew ? 'new-tile' : ''}" data-tile-value="${cell.value}" id="${tileId}" style="top: ${pos.y}px; left: ${pos.x}px;">${cell.value}</div>`);
+                $tile = $(`<div class="tile ${cell.isNew ? 'new-tile' : ''}" data-tile-value="${cell.value}" id="${tileId}" style="top: ${pos.y}px; left: ${pos.x}px;"">${cell.value}</div>`);
+                $tile[0].onclick = tileClickHandler;
                 $(".tile-layer").append($tile);
 
                 // Remove new-tile class after animation
@@ -387,8 +394,6 @@ function undoMove() {
   $('#undo-turns').text(canUndo);
 }
 
-let selectedTile = null;
-
 function swapTiles(tile1, tile2) {
     if (isMoving) return;
     
@@ -415,29 +420,29 @@ function swapTiles(tile1, tile2) {
     updateUI();
 }
 
-let swapMode = false;
-
 $('#swap-tiles-button').click(function() {
     swapMode = true;
-    $(this).addClass('active');
+    $('.tile').css('pointer-events', 'auto');
+    $(this).prop('disabled', true);
 });
 
-$('.tile-layer').on('click', '.tile', function() {
+function tileClickHandler(e) {
     if (!swapMode) return;
 
     if (selectedTile === null) {
-        selectedTile = this;
-        $(this).addClass('selected');
+        selectedTile = e.currentTarget;
+        $(e.currentTarget).addClass('selected');
     } else {
-        if (this !== selectedTile) {
-            swapTiles(selectedTile, this);
+        if (e.currentTarget !== selectedTile) {
+            swapTiles(selectedTile, e.currentTarget);
         }
         $(selectedTile).removeClass('selected');
         selectedTile = null;
         swapMode = false;
-        $('#swap-tiles-button').removeClass('active');
+    $('.tile').css('pointer-events', 'none');
+        $('#swap-tiles-button').prop('disabled', false);
     }
-});
+};
 
 
 function showDialogBox(mesg) {
