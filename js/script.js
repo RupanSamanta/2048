@@ -26,8 +26,9 @@ function initGame() {
     score = 0;
     tileCounter = 0;
     undoCount = 5;
+    swapCount = 5;
     $('.tile').remove(); // Clear all tiles
-    $('#undo-button').prop('disabled', true);
+    $('#undo-button, #swap-tiles-button').prop('disabled', true);
     $('#undo-turns').text(undoCount);
     $('#swap-tiles-turns').text(swapCount);
     addRandomTile();
@@ -299,6 +300,7 @@ function afterMove() {
     updateUI();
     // Add new tile quickly after move starts, not after animation completes
     $('#undo-button').prop('disabled', undoCount <= 0 ? true : false);
+    $('#swap-tiles-button').prop('disabled', swapCount <= 0 ? true : false);
     movesCount++;
     //$('#undo-turns').text(undoCount);
     setTimeout(() => {
@@ -422,13 +424,13 @@ function swapTiles(tile1, tile2) {
     updateUI();
 }
 
-$('#swap-tiles-button').click(function () {
+function enableSwapMode() {
     swapMode = true;
     isMoving = true; // Prevent moves during swap mode
     $('.tile').css('pointer-events', 'auto');
-    $(this).prop('disabled', true);
+    $('#swap-tiles-button').prop('disabled', true);
     document.documentElement.style.setProperty('--tile-brightness', '0.9');
-});
+}
 
 function tileClickHandler(e) {
     if (!swapMode) return;
@@ -516,6 +518,7 @@ $(document).ready(function () {
     });
 
     $('#undo-button').click(undoMove);
+    $('#swap-tiles-button').click(enableSwapMode);
 
     initGame();
 });
