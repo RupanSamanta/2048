@@ -4,11 +4,13 @@
   "description": "Play the classic 2048 puzzle game online. Combine tiles and reach 2048!",
   "main": "main.js",
   "scripts": {
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rupan Samanta",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^38.2.1"
+    "electron": "^38.2.1",
+    "electron-builder": "^26.0.12"
   }
 }
