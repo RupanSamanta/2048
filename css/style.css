@@ -256,6 +256,7 @@ body {
 
 .game-body .game-buttons button > * {
   color: #776e65;
+  fill: #776e65;
   font-weight: 600;
 }
 
