@@ -5,7 +5,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 450,
     height: 620,
-    icon: path.join(__dirname, 'build', 'icon.ico'), // custom icon
+    icon: path.join(__dirname, 'assets', 'icon.ico'), // custom icon
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,        // keep false for security

@@ -30,7 +30,7 @@
     ],
     "win": {
       "target": "portable",
-      "icon": "assets/images/icon.ico"
+      "icon": "assets/icon.ico"
     }
   },
   "dependencies": {
